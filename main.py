@@ -10,6 +10,7 @@ import makedata
 import serial
 
 import loadVideo
+import loadCSV
 
 
 class Application(tk.Frame):
@@ -27,6 +28,7 @@ class Application(tk.Frame):
                 #self.gazetrack = gt.GazeTrack(0)
 
                 self.inVideo = loadVideo.Video("OpenFace-master/patern1/patern1_In.mp4")
+                self.csvData = loadCSV.CSVData("OpenFace-master/patern1/patern1_In.csv")
 
 
                 basetime = datetime.datetime.now()
