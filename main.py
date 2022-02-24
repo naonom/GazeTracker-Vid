@@ -9,6 +9,9 @@ import gazetracker as gt
 import makedata
 import serial
 
+import loadVideo
+import loadCSV
+
 
 class Application(tk.Frame):
         #ls -l /dev/tty.*
@@ -22,7 +25,11 @@ class Application(tk.Frame):
                 self.master.geometry("720x450")
                 self.master.title("GazeTracker")
                 self.master.resizable(width=False, height=False)
-                self.gazetrack = gt.GazeTrack(0)
+                #self.gazetrack = gt.GazeTrack(0)
+
+                self.inVideo = loadVideo.Video("OpenFace-master/patern1/patern1_In.mp4")
+                self.csvData = loadCSV.CSVData("OpenFace-master/patern1/patern1_In.csv")
+
 
                 basetime = datetime.datetime.now()
                 self.makedata = makedata.MakeData(str(basetime.strftime("%Y,%m,%d,%H,%M")))
@@ -33,8 +40,10 @@ class Application(tk.Frame):
                 self.subWin = None
 
                 #プロパティ
-                self.width = self.gazetrack.cap.get( cv2.CAP_PROP_FRAME_WIDTH)
-                self.height = self.gazetrack.cap.get( cv2.CAP_PROP_FRAME_HEIGHT)
+                #self.width = self.gazetrack.cap.get( cv2.CAP_PROP_FRAME_WIDTH)
+                #self.height = self.gazetrack.cap.get( cv2.CAP_PROP_FRAME_HEIGHT)
+                self.width = self.inVideo.width
+                self.height = self.inVideo.height
 
                 self.xParam: list = [0, 0, 0]
                 self.yParam: list = [0, 0, 0]
@@ -120,7 +129,7 @@ class Application(tk.Frame):
                         toCenterButton = tk.Button(
                                 self.subApply,
                                 text="toCenter",
-                                command = self.toCenter
+                                #command = self.toCenter
                         )
                         toCenterButton.pack(side=LEFT)
                         applyButton = tk.Button(
@@ -135,8 +144,10 @@ class Application(tk.Frame):
                                 command = self.close_sub
                         )
                         cancelButton.pack(side=LEFT)
+        '''
         def toCenter(self):
                 self.gazetrack.toCenter()
+        '''
 
         def get_setting(self):
                 #self.basehead = self.head.get()
@@ -209,14 +220,17 @@ class Application(tk.Frame):
         
 
         def play_video(self):
-                self.gazetrack.tracking(height= self.height, width= self.width, dsize= 720, distance = self.dis, xdis = self.xdis, ydis = self.ydis)
-                #self.gazetrack.tracking(height= 720, width= 480, dsize= 720)
-                self.outputimage = PIL.Image.fromarray(self.gazetrack.outputframe)
-                self.norectimage = PIL.Image.fromarray(self.gazetrack.norectframe)
+                self.inVideo.playVideo(dsize=720)
+                #cv2.imshow("video", invidImage)
+                self.invidImage = PIL.Image.fromarray(self.inVideo.frame)
+                self.invidPhoto = PIL.ImageTk.PhotoImage(image=self.invidImage)
+                self.canvas.create_image(0, 30, image=self.invidPhoto, anchor=tk.NW)
+
+                '''
                 self.image = PIL.Image.fromarray(self.gazetrack.frame)
                 self.photo = PIL.ImageTk.PhotoImage(image = self.image)
                 self.canvas.create_image(0, 30, image= self.photo, anchor = tk.NW)
-
+                '''
                 #csv
                 '''
                 self.makedata.addData(
@@ -233,6 +247,7 @@ class Application(tk.Frame):
                         pointing=self.pointing
                 )
                 '''
+                '''
                 self.makedata.addNewData(
                                 gaze_x=self.gazetrack.getAngle.gazeAngleData[0],
                                 gaze_y=self.gazetrack.getAngle.gazeAngleData[1],
@@ -245,6 +260,7 @@ class Application(tk.Frame):
                                 yParam=self.ydis,
                                 pointing=self.pointing,
                         )
+                '''
                 #10ms
                 self.master.after(self.delay, self.play_video)
         
