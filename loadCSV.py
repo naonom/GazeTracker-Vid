@@ -8,7 +8,6 @@ class CSVData():
     gazeY:list[float]
 
     def __init__(self, csvPath:str):
-
         self.df = pd.read_csv(csvPath, encoding="SHIFT_JIS", usecols=[0, 2, 11, 12])
         self.frameData = self.df["frame"].tolist()
         self.timeData = self.df["timestamp"].tolist()

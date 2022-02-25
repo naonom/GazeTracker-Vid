@@ -17,8 +17,8 @@ class Video():
             #print(str(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)))
         self.coutFrame = 0
 
-    def playVideo(self, dsize:int):
-        self.cap.set(cv2.CAP_PROP_POS_FRAMES, 50)
+    def playVideo(self, dsize:int, frame:int):
+        self.cap.set(cv2.CAP_PROP_POS_FRAMES, frame)
         ret, self.frame = self.cap.read()
         if ret == True:
             self.frame = cv2.resize(self.frame, dsize=(dsize, int(dsize*int(self.height)/int(self.width))))
