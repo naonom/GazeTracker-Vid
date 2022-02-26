@@ -12,8 +12,9 @@ class CSVData():
         self.frameData = self.df["frame"].tolist()
         self.timeData = self.df["timestamp"].tolist()
         self.gazeX = self.df["gaze_angle_x"].tolist()
-        self.gazeX = self.df["gaze_angle_y"].tolist()
+        self.gazeY = self.df["gaze_angle_y"].tolist()
 
+        print(self.gazeX)
     def p(self):
         print("end load")
         #print(self.a[100])
