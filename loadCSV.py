@@ -14,7 +14,6 @@ class CSVData():
         self.gazeX = self.df["gaze_angle_x"].tolist()
         self.gazeY = self.df["gaze_angle_y"].tolist()
 
-        print(self.gazeX)
     def p(self):
         print("end load")
         #print(self.a[100])

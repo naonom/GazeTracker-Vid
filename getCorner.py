@@ -1,6 +1,10 @@
 import os
+import statistics
 
 class DitectCorner():
+    rawDataX: list = []
+    rawDataY: list = []
+
     def __init__(self):
         self.leftupX: float=0.0
         self.leftdownX: float=0.0
@@ -12,37 +16,38 @@ class DitectCorner():
         self.rightupY: float=0.0
         self.rightdownY: float=0.0
 
-        self.rawDataX: float=0.0
-        self.rawDataY: float=0.0
-
-        self.count: int=0
 
     def reset(self):
-        self.rawDataX=0.0
-        self.rawDataY=0.0
+        try:
+            self.rawDataX.clear()
+            self.rawDataY.clear()
+        except:
+            print("raw data is null")
 
-        self.count=0
 
     def getData(self, angleX:float, angleY:float):
-        self.count+=1
-        self.rawDataX=(self.rawDataX+angleX)/self.count
-        self.rawDataY=(self.rawDataY+angleY)/self.count
+        self.rawDataX.append(angleX)
+        self.rawDataY.append(angleY)
 
     def setData(self, corner:str):
-        if corner == "leftup":
-            self.leftupX=self.rawDataX
-            self.leftupY=self.rawDataY
-        if corner == "leftdown":
-            self.leftdownX=self.rawDataX
-            self.leftdownY=self.rawDataY
-        if corner == "rightup":
-            self.rightupX=self.rawDataX
-            self.rightupY=self.rawDataY
-        if corner == "rightdown":
-            self.rightdownX=self.rawDataX
-            self.rightdownY=self.rawDataY
+        try:
+            dataX = statistics.mean(self.rawDataX)
+            dataY = statistics.mean(self.rawDataY)
+            if corner == "leftup":
+                self.leftupX=dataX
+                self.leftupY=dataY
+            if corner == "leftdown":
+                self.leftdownX=dataX
+                self.leftdownY=dataY
+            if corner == "rightup":
+                self.rightupX=dataX
+                self.rightupY=dataY
+            if corner == "rightdown":
+                self.rightdownX=dataX
+                self.rightdownY=dataY
+        except:
+            print("set data fail")
 
     def showData(self):
-        print(self.count)
         print(self.leftupX)
         print(self.leftupY)
