@@ -13,6 +13,7 @@ import loadVideo
 import loadCSV
 
 import getCorner
+import CornerToFrame
 
 
 class Application(tk.Frame):
@@ -36,6 +37,9 @@ class Application(tk.Frame):
                 self.getCorner.reset()
                 self.corner: bool = False
 
+                self.toCorner = CornerToFrame.toPoint()
+                self.toCorner.estimateCorner()
+
                 self.width = self.inVideo.width
                 self.height = self.inVideo.height
 
@@ -52,6 +56,7 @@ class Application(tk.Frame):
                 self.create_frame()
                 self.create_widget()
                 self.delay = 16
+                #self.delay = 7
                 self.play_video()
                 #self.setCorner()
 
@@ -115,7 +120,7 @@ class Application(tk.Frame):
                         print("x")
                         self.corner=False
                         self.getCorner.reset()
-                        self.getCorner.showData()
+                        #self.getCorner.showData()
                 
                 #set corner
                 if key == "c":#leftup
@@ -130,6 +135,8 @@ class Application(tk.Frame):
                 if key == "n":#rightdown
                         print("n")
                         self.ditectCorner(corner="rightdown")
+                if key == "m":#text
+                        self.getCorner.saveTxt()
 
                 
                 
@@ -143,7 +150,7 @@ class Application(tk.Frame):
         '''
         def ditectCorner(self, corner:str):
                 self.getCorner.setData(corner)
-                self.getCorner.showData()
+                #self.getCorner.showData()
 
                 
         def endApp(self):

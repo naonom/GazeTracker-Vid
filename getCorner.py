@@ -48,6 +48,29 @@ class DitectCorner():
         except:
             print("set data fail")
 
-    def showData(self):
-        print(self.leftupX)
-        print(self.leftupY)
+    def saveTxt(self):
+    
+        path_w="corner2.txt"
+        text:list=[]
+        text.append(str(self.leftupX)+"\n")
+        text.append(str(self.leftupY)+"\n")
+
+        text.append("\n")
+
+        text.append(str(self.leftdownX)+"\n")
+        text.append(str(self.leftdownY)+"\n")
+
+        text.append("\n")
+
+        text.append(str(self.rightupX)+"\n")
+        text.append(str(self.rightupY)+"\n")
+
+        text.append("\n")
+
+        text.append(str(self.rightdownX)+"\n")
+        text.append(str(self.rightdownY)+"\n")
+        with open(path_w, mode="w") as f:
+            f.write("test")
+            for w in text:
+                f.write(w)
+        
