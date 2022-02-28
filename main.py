@@ -13,7 +13,6 @@ import loadVideo
 import loadCSV
 
 import getCorner
-import CornerToFrame
 
 
 class Application(tk.Frame):
@@ -30,15 +29,13 @@ class Application(tk.Frame):
                 self.master.resizable(width=False, height=False)
                 #self.gazetrack = gt.GazeTrack(0)
 
-                self.inVideo = loadVideo.Video("OpenFace-master/patern1/patern1_In.mp4")
+                #self.inVideo = loadVideo.Video("OpenFace-master/patern1/patern1_In.mp4")
+                self.inVideo = loadVideo.Video("OpenFace-master/patern1/patern1_Out.mp4")
                 self.csvData = loadCSV.CSVData("OpenFace-master/patern1/patern1_In.csv")
 
                 self.getCorner = getCorner.DitectCorner()
                 self.getCorner.reset()
                 self.corner: bool = False
-
-                self.toCorner = CornerToFrame.toPoint()
-                self.toCorner.estimateCorner()
 
                 self.width = self.inVideo.width
                 self.height = self.inVideo.height
@@ -169,7 +166,8 @@ class Application(tk.Frame):
         
 
         def play_video(self):
-                self.inVideo.playVideo(dsize=720, frame=self.frame)
+                #self.inVideo.playVideo(dsize=720, frame=self.frame)
+                self.inVideo.playVideoOut(dsize=720, frame=self.frame, gazeX=self.csvData.gazeX[self.frame], gazeY=self.csvData.gazeY[self.frame])
                 #cv2.imshow("video", invidImage)
                 self.invidImage = PIL.Image.fromarray(self.inVideo.frame)
                 self.invidPhoto = PIL.ImageTk.PhotoImage(image=self.invidImage)

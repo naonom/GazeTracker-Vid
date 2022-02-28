@@ -1,6 +1,7 @@
 import os
 import statistics
 
+
 class DitectCorner():
     rawDataX: list = []
     rawDataY: list = []
@@ -15,7 +16,6 @@ class DitectCorner():
         self.leftdownY: float=0.0
         self.rightupY: float=0.0
         self.rightdownY: float=0.0
-
 
     def reset(self):
         try:
