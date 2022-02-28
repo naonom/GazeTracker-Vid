@@ -38,7 +38,7 @@ class Video():
         self.cap.set(cv2.CAP_PROP_POS_FRAMES, frame)
         ret, self.frame = self.cap.read()
         if ret == True:
-            print(int(self.tiltX * gazeX + self.diffX))
+            #print(int(self.tiltX * gazeX + self.diffX))
             #print(int(self.tiltY * gazeY + self.diffY))
             cv2.rectangle(self.frame, pt1=(0, 0), pt2=(100, 100), color=(0,0,255), thickness=4)
             self.frame = cv2.resize(self.frame, dsize=(dsize, int(dsize*int(self.height)/int(self.width))))
