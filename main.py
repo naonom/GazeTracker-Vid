@@ -12,6 +12,8 @@ import serial
 import loadVideo
 import loadCSV
 
+import getCorner
+
 
 class Application(tk.Frame):
         #ls -l /dev/tty.*
@@ -27,8 +29,13 @@ class Application(tk.Frame):
                 self.master.resizable(width=False, height=False)
                 #self.gazetrack = gt.GazeTrack(0)
 
-                self.inVideo = loadVideo.Video("OpenFace-master/patern1/patern1_In.mp4")
+                #self.inVideo = loadVideo.Video("OpenFace-master/patern1/patern1_In.mp4")
+                self.inVideo = loadVideo.Video("OpenFace-master/patern1/patern1_Out.mp4")
                 self.csvData = loadCSV.CSVData("OpenFace-master/patern1/patern1_In.csv")
+
+                self.getCorner = getCorner.DitectCorner()
+                self.getCorner.reset()
+                self.corner: bool = False
 
                 self.width = self.inVideo.width
                 self.height = self.inVideo.height
@@ -46,7 +53,11 @@ class Application(tk.Frame):
                 self.create_frame()
                 self.create_widget()
                 self.delay = 16
+                #self.delay = 7
                 self.play_video()
+                #self.setCorner()
+
+
 
                 try:
                         self.com = '/dev/tty.usbserial-3552041E93'
@@ -97,6 +108,47 @@ class Application(tk.Frame):
                 if key == "e":
                         self.endApp()
                         #self.makedata.closeFile()
+
+                #start ditect corner
+                if key == "z":
+                        print("z")
+                        self.corner=True
+                if key == "x":
+                        print("x")
+                        self.corner=False
+                        self.getCorner.reset()
+                        #self.getCorner.showData()
+                
+                #set corner
+                if key == "c":#leftup
+                        print("c")
+                        self.ditectCorner(corner="leftup")
+                if key == "v":#leftdown
+                        print("v")
+                        self.ditectCorner(corner="leftdown")
+                if key == "b":#rightup
+                        print("b")
+                        self.ditectCorner(corner="rightup")
+                if key == "n":#rightdown
+                        print("n")
+                        self.ditectCorner(corner="rightdown")
+                if key == "m":#text
+                        self.getCorner.saveTxt()
+
+                
+                
+        '''
+        def setCorner(self):
+                if self.corner == True:
+                        print("setCorner")
+                        self.getCorner.getData(angleX=self.csvData.gazeX[self.frame], angleY=self.csvData.gazeY[self.frame])
+
+                self.master.after(self.delay, self.play_video)
+        '''
+        def ditectCorner(self, corner:str):
+                self.getCorner.setData(corner)
+                #self.getCorner.showData()
+
                 
         def endApp(self):
                 self.master.destroy()
@@ -114,11 +166,15 @@ class Application(tk.Frame):
         
 
         def play_video(self):
-                self.inVideo.playVideo(dsize=720, frame=self.frame)
+                #self.inVideo.playVideo(dsize=720, frame=self.frame)
+                self.inVideo.playVideoOut(dsize=720, frame=self.frame, gazeX=self.csvData.gazeX[self.frame], gazeY=self.csvData.gazeY[self.frame])
                 #cv2.imshow("video", invidImage)
                 self.invidImage = PIL.Image.fromarray(self.inVideo.frame)
                 self.invidPhoto = PIL.ImageTk.PhotoImage(image=self.invidImage)
                 self.canvas.create_image(0, 30, image=self.invidPhoto, anchor=tk.NW)
+
+                if self.corner == True:
+                        self.getCorner.getData(angleX=self.csvData.gazeX[self.frame], angleY=self.csvData.gazeY[self.frame])
 
                 self.frame +=1
 
