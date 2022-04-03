@@ -9,6 +9,11 @@ import gazetracker as gt
 import makedata
 import serial
 
+import loadVideo
+import loadCSV
+
+import getCorner
+
 
 class Application(tk.Frame):
         #ls -l /dev/tty.*
@@ -22,19 +27,18 @@ class Application(tk.Frame):
                 self.master.geometry("720x450")
                 self.master.title("GazeTracker")
                 self.master.resizable(width=False, height=False)
-                self.gazetrack = gt.GazeTrack(0)
+                #self.gazetrack = gt.GazeTrack(0)
 
-                basetime = datetime.datetime.now()
-                self.makedata = makedata.MakeData(str(basetime.strftime("%Y,%m,%d,%H,%M")))
-                #self.makedata.makefile()
-                self.makedata.makeFile()
-                self.makedata.openFile()
-                self.makedata.makeHeader()
-                self.subWin = None
+                self.inVideo = loadVideo.Video("OpenFace-master/patern1/patern1_In.mp4")
+                #self.inVideo = loadVideo.Video("OpenFace-master/patern1/patern1_Out.mp4")
+                self.csvData = loadCSV.CSVData("OpenFace-master/patern1/patern1_In.csv")
 
-                #プロパティ
-                self.width = self.gazetrack.cap.get( cv2.CAP_PROP_FRAME_WIDTH)
-                self.height = self.gazetrack.cap.get( cv2.CAP_PROP_FRAME_HEIGHT)
+                self.getCorner = getCorner.DitectCorner()
+                self.getCorner.reset()
+                self.corner: bool = False
+
+                self.width = self.inVideo.width
+                self.height = self.inVideo.height
 
                 self.xParam: list = [0, 0, 0]
                 self.yParam: list = [0, 0, 0]
@@ -43,11 +47,17 @@ class Application(tk.Frame):
                 self.ydis: float = 0.0
                 self.dis: int = 50
 
+                self.frame = 0
+
 
                 self.create_frame()
                 self.create_widget()
-                self.delay = 10
+                self.delay = 16
+                #self.delay = 7
                 self.play_video()
+                #self.setCorner()
+
+
 
                 try:
                         self.com = '/dev/tty.usbserial-3552041E93'
@@ -78,76 +88,10 @@ class Application(tk.Frame):
                         self.subWin = tk.Toplevel()
                         self.subWin.resizable(width=False, height=False)
                         self.subWin.geometry("350x150")
-                        self.subWin.title("camera")
-                        distance = tk.Label(self.subWin, text="distance")
-                        distance.grid(row=0, column=0, padx=5, pady=2, sticky=tk.E)
-                        headLabel = tk.Label(self.subWin, text="xParam")
-                        headLabel.grid(row=1, column=0, padx=5, pady=2, sticky=tk.E)
-                        outcameraLabel = tk.Label(self.subWin, text="yParam")
-                        outcameraLabel.grid(row=2, column=0, padx=5, pady=2, sticky=tk.E)
                         
-                        self.distance = tk.StringVar()
-                        distanceEntry = tk.Entry(
-                                self.subWin,
-                                textvariable=self.distance,
-                                width=20
-                        )
-                        distanceEntry.insert(tk.END, "0")
-                        distanceEntry.grid(row=0, column=1)
-
-                        self.head = tk.StringVar()
-                        headEntry = tk.Entry(
-                                self.subWin,
-                                textvariable=self.head,
-                                width=20
-                        )
-                        headEntry.insert(tk.END, "0.0")
-                        headEntry.grid(row=1, column=1)
-
-
-                        self.outCamera = tk.StringVar()
-                        outCameraEntry = tk.Entry(
-                                self.subWin,
-                                textvariable=self.outCamera,
-                                width=20
-                        )
-                        outCameraEntry.insert(tk.END, "0.0")
-                        outCameraEntry.grid(row=2, column=1)
-                        #incamera_label.pack()
-                        self.subApply = tk.Frame(self.subWin)
-                        self.subApply.grid(row=3, column=1, padx=0, pady=5, sticky=tk.W)
-
-                        toCenterButton = tk.Button(
-                                self.subApply,
-                                text="toCenter",
-                                command = self.toCenter
-                        )
-                        toCenterButton.pack(side=LEFT)
-                        applyButton = tk.Button(
-                                self.subApply,
-                                text="Apply",
-                                command = self.get_setting
-                        )
-                        applyButton.pack(side=LEFT)
-                        cancelButton = tk.Button(
-                                self.subApply,
-                                text="Cancel",
-                                command = self.close_sub
-                        )
-                        cancelButton.pack(side=LEFT)
-        def toCenter(self):
-                self.gazetrack.toCenter()
-
         def get_setting(self):
-                #self.basehead = self.head.get()
-                #self.baseoutcamera = self.outCamera.get()
                 try:
-                        #self.xParam = list(map(int, self.basehead.split(",")))
-                        #self.yParam = list(map(int, self.baseoutcamera.split(",")))
-                        self.dis = int(self.distance.get())
-                        self.xdis = float(self.head.get())
-                        self.ydis = float(self.outCamera.get())
-                        
+                        print("for demo")
                 except:
                         return
 
@@ -158,40 +102,53 @@ class Application(tk.Frame):
                 key = e.keysym
                 if key == "p":
                         self.takePhoto()
-                        '''
-                        self.makedata.addData(
-                                gaze_x=self.gazetrack.getAngle.gazeAngleData[0],
-                                gaze_y=self.gazetrack.getAngle.gazeAngleData[1],
-                                basepoint_x=self.gazetrack.getAngle.pointData[0],
-                                basepoint_y=self.gazetrack.getAngle.pointData[1],
-                                showpoint_x=self.gazetrack.getAngle.showPoint_x,
-                                showpoint_y=self.gazetrack.getAngle.showPoint_y,
-                                scale_x=self.xParam[0],
-                                scale_y=self.yParam[0],
-                                zeropoint_x=self.xParam[1],
-                                zeropoint_y=self.yParam[1],
-                                pointing=self.pointing
-                        )
-                        '''
-                        self.makedata.addNewData(
-                                gaze_x=self.gazetrack.getAngle.gazeAngleData[0],
-                                gaze_y=self.gazetrack.getAngle.gazeAngleData[1],
-                                basepoint_x=self.gazetrack.getAngle.pointData[0],
-                                basepoint_y=self.gazetrack.getAngle.pointData[1],
-                                showpoint_x=self.gazetrack.getAngle.showPoint_x,
-                                showpoint_y=self.gazetrack.getAngle.showPoint_y,
-                                distance=self.dis,
-                                xParam=self.xdis,
-                                yParam=self.ydis,
-                                pointing=self.pointing,
-                        )
-                        
                         self.pointing = False
                 if key == "s":
                         self.setup_window()
                 if key == "e":
                         self.endApp()
-                        self.makedata.closeFile()
+                        #self.makedata.closeFile()
+
+                #start ditect corner
+                if key == "z":
+                        print("z")
+                        self.corner=True
+                if key == "x":
+                        print("x")
+                        self.corner=False
+                        self.getCorner.reset()
+                        #self.getCorner.showData()
+                
+                #set corner
+                if key == "c":#leftup
+                        print("c")
+                        self.ditectCorner(corner="leftup")
+                if key == "v":#leftdown
+                        print("v")
+                        self.ditectCorner(corner="leftdown")
+                if key == "b":#rightup
+                        print("b")
+                        self.ditectCorner(corner="rightup")
+                if key == "n":#rightdown
+                        print("n")
+                        self.ditectCorner(corner="rightdown")
+                if key == "m":#text
+                        self.getCorner.saveTxt()
+
+                
+                
+        '''
+        def setCorner(self):
+                if self.corner == True:
+                        print("setCorner")
+                        self.getCorner.getData(angleX=self.csvData.gazeX[self.frame], angleY=self.csvData.gazeY[self.frame])
+
+                self.master.after(self.delay, self.play_video)
+        '''
+        def ditectCorner(self, corner:str):
+                self.getCorner.setData(corner)
+                #self.getCorner.showData()
+
                 
         def endApp(self):
                 self.master.destroy()
@@ -209,42 +166,18 @@ class Application(tk.Frame):
         
 
         def play_video(self):
-                self.gazetrack.tracking(height= self.height, width= self.width, dsize= 720, distance = self.dis, xdis = self.xdis, ydis = self.ydis)
-                #self.gazetrack.tracking(height= 720, width= 480, dsize= 720)
-                self.outputimage = PIL.Image.fromarray(self.gazetrack.outputframe)
-                self.norectimage = PIL.Image.fromarray(self.gazetrack.norectframe)
-                self.image = PIL.Image.fromarray(self.gazetrack.frame)
-                self.photo = PIL.ImageTk.PhotoImage(image = self.image)
-                self.canvas.create_image(0, 30, image= self.photo, anchor = tk.NW)
+                self.inVideo.playVideo(dsize=720, frame=self.frame)
+                #self.inVideo.playVideoOut(dsize=720, frame=self.frame, gazeX=self.csvData.gazeX[self.frame], gazeY=self.csvData.gazeY[self.frame])
+                #cv2.imshow("video", invidImage)
+                self.invidImage = PIL.Image.fromarray(self.inVideo.frame)
+                self.invidPhoto = PIL.ImageTk.PhotoImage(image=self.invidImage)
+                self.canvas.create_image(0, 30, image=self.invidPhoto, anchor=tk.NW)
 
-                #csv
-                '''
-                self.makedata.addData(
-                        gaze_x=self.gazetrack.getAngle.gazeAngleData[0],
-                        gaze_y=self.gazetrack.getAngle.gazeAngleData[1],
-                        basepoint_x=self.gazetrack.getAngle.pointData[0],
-                        basepoint_y=self.gazetrack.getAngle.pointData[1],
-                        showpoint_x=self.gazetrack.getAngle.showPoint_x,
-                        showpoint_y=self.gazetrack.getAngle.showPoint_y,
-                        scale_x=self.xParam[0],
-                        scale_y=self.yParam[0],
-                        zeropoint_x=self.xParam[1],
-                        zeropoint_y=self.yParam[1],
-                        pointing=self.pointing
-                )
-                '''
-                self.makedata.addNewData(
-                                gaze_x=self.gazetrack.getAngle.gazeAngleData[0],
-                                gaze_y=self.gazetrack.getAngle.gazeAngleData[1],
-                                basepoint_x=self.gazetrack.getAngle.pointData[0],
-                                basepoint_y=self.gazetrack.getAngle.pointData[1],
-                                showpoint_x=self.gazetrack.xTrack,
-                                showpoint_y=self.gazetrack.yTrack,
-                                distance=self.dis,
-                                xParam=self.xdis,
-                                yParam=self.ydis,
-                                pointing=self.pointing,
-                        )
+                if self.corner == True:
+                        self.getCorner.getData(angleX=self.csvData.gazeX[self.frame], angleY=self.csvData.gazeY[self.frame])
+
+                self.frame +=1
+
                 #10ms
                 self.master.after(self.delay, self.play_video)
         
